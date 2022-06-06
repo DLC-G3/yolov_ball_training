@@ -1,0 +1,11 @@
+notebook.ipynb
+ball_output
+trained_data
+training_data
+
+*__pycache__
+*environment_data.json
+*cache
+*data
+**.mp4
+**.jpg
