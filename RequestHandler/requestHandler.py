@@ -1,4 +1,5 @@
 from DataHandler.UtilityHandler import UtilityHandler
+# from UtilityHandler import UtilityHandler
 
 from time import sleep
 from datetime import datetime
@@ -44,8 +45,10 @@ class RequestHandler():
 
         # with requests.Session() as s:
         #     self.login(s)
-        #     # self.request_clips_for_filtered_recordings(s)
         #     record_id = self.get_recording_by_name(s,"A-Team - Diest")["id"]
+        #     self.download_recordings_by_cam(s,record_id)
+
+        #     # self.request_clips_for_filtered_recordings(s)
         #     self.get_or_add_canvas(s,record_id,"Jorik et Cool =)")
         #     self.add_flag_to_canvas(s,record_id,"Jorik et Cool =)",self.flag_struct,'Kobe')
 
@@ -72,6 +75,40 @@ class RequestHandler():
         self.headers['cookie'] = '; '.join([x.name + '=' + x.value for x in r.cookies])
         print(f'Login: {status_codes[r.status_code]}')
         
+    # download videos    
+
+    def get_recording_data(self,s,recording_id):
+        url = self.url + f'/annotation-area/recordings/{recording_id}'
+        r = s.get(url,headers={"Accept":"application/json"})
+        return json.loads(r.content)
+
+    def get_recording_urls(self,s,recording_id):
+        recording_data = self.get_recording_data(s,recording_id)
+        channels = recording_data["Channels"]
+        urls = [channel["Streams"][0]["path"] for channel in channels]
+        return urls
+
+    def download_recordings_by_cam(self,s,recording_id,cams=[4,6]):
+        urls = self.get_recording_urls(s,recording_id)
+        filtered_urls = [self.download_video(urls[cam-1]) for cam in cams]
+        print(filtered_urls)
+
+    def download_video(self,url):
+        file_name = url.split('/')[-1].split('?')[0]
+        print ("Downloading file: %s"%file_name)
+    
+        #create response object
+        r = requests.get(url, stream = True)
+    
+        #download started
+        with open(f"DataHandler/SourceFiles/Video/{file_name}", 'wb') as f:
+            for chunk in r.iter_content(chunk_size = 1024*1024):
+                if chunk:
+                    f.write(chunk)
+                    continue
+                break
+        return url
+
     def get_flags_by_recording(self,s,recording_id):
         url = self.url + f'/annotation-area/recordings/{recording_id}/annotation-events'
         r = s.get(url)
@@ -271,18 +308,6 @@ class RequestHandler():
         with open(f'{data_path}/data/flags.json','r',encoding='utf8') as f:
             json_ = json.load(f)
             for flag_data in json_:
-
-                # self.flag_struct = {
-                #     'id':'', 
-                #     'channel_name': 'ch1',
-                #     'time': UtilityHandler.convert_time(0,0,0), # h,m,s
-                #     'comment': '',
-                #     'offset_before': 10000,
-                #     'offset_after': 5000,
-                #     'hasValidationErrors': False,
-                #     'getValidationErrorsList':'', 
-                # }
-
                 self.add_flag_to_canvas(s,recording_id,canvas_name,flag_data["flag"],flag_data["annotation_name"])
             f.close()
 
