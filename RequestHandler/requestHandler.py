@@ -95,7 +95,7 @@ class RequestHandler():
 
     def download_video(self,url):
         file_name = url.split('/')[-1].split('?')[0]
-        print ("Downloading file: %s"%file_name)
+        print(f"Downloading file: {file_name}, this may take a while")
     
         #create response object
         r = requests.get(url, stream = True)
@@ -107,6 +107,8 @@ class RequestHandler():
                     f.write(chunk)
                     continue
                 break
+
+        print("Finished downloading file.")
         return url
 
     def get_flags_by_recording(self,s,recording_id):

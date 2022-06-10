@@ -85,11 +85,14 @@ def get_all_cropped_images(clip,cam,start_video=90,cropped_under_line=True,clear
     count +=1
     continue
 
+  print("starting conversion")
   while success:
     image = image[vector["y"]:vector["h"],vector["x"]:vector["w"]]
     cv2.imwrite(f"{image_path}/frame{count}.jpg", image)     # save frame as JPEG file    
     success,image = vidcap.read()
-    print(f'Read a new frame {count}: {success}')
+    # print(f'Read a new frame {count}: {success}')
     count += 1
+
+  print("done converting video")
 
 #get_cropped_images()
