@@ -327,7 +327,7 @@ class RequestHandler():
         if validators.url(string):
             return string.split('/')[-1]
         else:
-            return self.get_recording_by_name(self,s,string)
+            return self.get_recording_by_name(self,s,string)["id"]
 
     def get_recording_by_name(self,s,title):
         recordings = self.get_all_recordings(s)
