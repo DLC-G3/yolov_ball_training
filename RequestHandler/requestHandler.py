@@ -323,11 +323,18 @@ class RequestHandler():
                 temp_recording_ids.append(recording_id)
         return temp_recording_ids
 
-    def get_recording_id(self,s,string):
+    def get_recording(self,s,string):
         if validators.url(string):
-            return string.split('/')[-1]
+            return self.get_recording_by_id(s,int(string.split('/')[-1]))
         else:
-            return self.get_recording_by_name(self,s,string)["id"]
+            return self.get_recording_by_name(s,string)
+    
+    def get_recording_by_id(self,s,recording_id):
+        recordings = self.get_all_recordings(s)
+        for recording in recordings:
+            if recording['id'] == recording_id:
+                return recording
+        return None
 
     def get_recording_by_name(self,s,title):
         recordings = self.get_all_recordings(s)
