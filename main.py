@@ -1,4 +1,4 @@
-# import yolov5_custom.detect as detect
+import yolov5_custom.detect as detect
 from RequestHandler.requestHandler import RequestHandler
 from DataHandler.GoalDetection import GoalDetection
 import DataHandler.VideoHandler as VideoHandler
