@@ -30,9 +30,8 @@ if __name__ == '__main__':
         #detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2) 
         #detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}_cropped_full.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2)
         
-        detected_objects = {"test":123}
-        #detected_objects = detect.run_optimised_for_ball(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output") 
-        #print(detected_objects)
+        detected_objects = detect.run_optimised_for_ball(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output") 
+        print(detected_objects)
 
 
         with open(f"ball_output/labels_detected_obj_{cam}.json","w") as f:
