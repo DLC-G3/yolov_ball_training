@@ -101,12 +101,34 @@ class RequestHandler():
         r = requests.get(url, stream = True)
     
         #download started
-        with open(f"DataHandler/SourceFiles/Video/{file_name}", 'wb') as f:
+        with open(f"DataHandler/SourceFiles/Videos/{file_name}", 'wb') as f:
             for chunk in r.iter_content(chunk_size = 1024*1024):
                 if chunk:
                     f.write(chunk)
                     continue
                 break
+
+        print("Finished downloading file.")
+        return url
+
+    def get_thumbnail_urls(self,s,recording_id):
+        recording_data = self.get_recording_data(s,recording_id)
+        channels = recording_data["Channels"]
+        urls = [channel["Streams"][0]["thumbnail"] for channel in channels]
+        return urls
+
+    def download_thumbnail_by_cam(self,s,recording_id,cams=[4,6]):
+        urls = self.get_thumbnail_urls(s,recording_id)
+        filtered_urls = [self.download_thumbnail(urls[cam-1]) for cam in cams]
+        print(filtered_urls)
+
+    def download_thumbnail(self,url):
+        file_name = url.split('/')[-1].split('?')[0]
+        r = requests.get(url,stream=True)
+
+        with open(f"DataHandler/SourceFiles/Images/{file_name}", 'wb') as f:
+            f.write(r.content)
+            f.close()
 
         print("Finished downloading file.")
         return url
