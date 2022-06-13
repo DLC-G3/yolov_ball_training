@@ -1,10 +1,11 @@
 class GoalDetection():
     @staticmethod
-    def detect_goals_from_json(data,consecutive_frames=3,wait_interval=100,suffix="frame",extension=".jpg",consecutive_th=2):
+    def detect_goals_images(data,consecutive_frames=3,wait_interval=100,suffix="frame",extension=".jpg",consecutive_th=2):
         consecutive_balls = 1
         prev_frame = 0
         check_delay = 0
         for img,data in data.items():
+            print(data)
             for obj in data:
                 frame = int(img.replace(suffix,"").replace(extension,""))
                 class_ = obj["class"]
@@ -23,3 +24,55 @@ class GoalDetection():
             consecutive_balls = 1
             check_delay = max(0,check_delay-1)
             prev_frame = frame
+
+    @staticmethod
+    def get_filtered_frames(data):
+        filtered_objects = GoalDetection.filter_objects(data)
+        return [goal for goal in filtered_objects.keys()]
+        
+    @staticmethod
+    def filter_objects(data):
+        valid_frames = {}
+        for frame,detected_objects in data.items():
+            for obj in detected_objects:
+                class_,coords,confidence = obj["class"],[round(coord,2) for coord in obj["coords"]],round(obj["confidence"]*100,2)
+                
+                if class_ != "Ball":
+                    continue
+                # implement extra checks with coords
+                # implement extra checks with confidence?
+
+                valid_frames[frame] = {"coords":coords,"confidence":confidence}
+                continue
+        return GoalDetection.normalize_consecutive_frames(valid_frames)
+
+    # @staticmethod
+    # def normalize_consecutive_frames(frames,allowed_difference=2,delay = 750):
+    #     normalized_frames ={}
+    #     prev_frame = 0
+    #     for frame,obj in frames.items():
+    #         if frame <= prev_frame + allowed_difference:
+    #             normalized_frames[frame] = obj
+    #             prev_frame = 0
+    #             continue
+    #         prev_frame = frame
+    #     return normalized_frames
+
+    @staticmethod
+    def normalize_consecutive_frames(frames,allowed_difference,consecutive_threshhold=2,delay=750):
+        norm_frames = []
+        consecutive_count = 0
+
+        for i,f in enumerate(frames):
+            if len(norm_frames):
+                if f < (norm_frames[-1] + delay): # if current frame is within delay of last set flag
+                    continue # skip rest of checks
+
+            if f >= (frames[i+1] - allowed_difference): # if current frame is close to next frame
+                consecutive_count +=1 
+                if consecutive_count >= consecutive_threshhold: # if multiple frames have been noticed close to each other
+                    norm_frames.append({"frame":f,"cons":consecutive_count}) # add the current frame to the normalized frames
+                    consecutive_count = 0 # reset the consecutive count
+                continue
+
+            consecutive_count = 0

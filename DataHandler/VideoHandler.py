@@ -95,4 +95,33 @@ def get_all_cropped_images(clip,cam,start_video=90,cropped_under_line=True,clear
 
   print("done converting video")
 
-#get_cropped_images()
+def crop_video(clip,cam=6,src_path="DataHandler/SourceFiles/Videos",dest_path="DataHandler/SourceFiles/CroppedVideos",max_frame=-1):
+  cap = cv2.VideoCapture(f"{src_path}/{clip}.mp4")
+  fps= cap.get(cv2.CAP_PROP_FPS)
+  vector = {4:{"x":460,"y":910,"w":1010,"h":1080-910},6:{"x":530,"y":900,"w":930,"h":1080-900}}[cam]
+
+  # vector = {"x":420,"y":900,"w":1100,"h":1080-900}
+  # vector["h"] = 1080 - vector["y"]
+
+  fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+  out = cv2.VideoWriter(f"{dest_path}/{clip}.mp4", fourcc, fps, (vector["w"], vector["h"]))
+
+  f_count = 0
+  while(cap.isOpened()):
+      ret, frame = cap.read()
+      f_count += 1
+      if f_count == max_frame:
+        break
+
+      if ret==True:
+          crop_frame = frame[vector["y"]:vector["y"] + vector["h"],vector["x"]:vector["x"]+vector["w"]]
+          out.write(crop_frame)
+
+          if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+          continue
+      break
+
+  cap.release()
+  out.release()
+  cv2.destroyAllWindows()

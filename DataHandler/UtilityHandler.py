@@ -6,8 +6,13 @@ path = str(Path(sys.path[0])) + "/DataHandler"
 
 class UtilityHandler():
     @staticmethod
-    def convert_time(h,m,s,frame=1,fps=25):
+    def convert_time(h,m,s,frame=1,fps=25.033316316784834):
         ms = (h*3600 +m*60 + s)*1000+(1000/fps*frame)
+        return ms
+
+    @staticmethod
+    def convert_frame_to_time(frame,fps=25.033316316784834):
+        ms = 1000/fps*frame
         return ms
 
     @staticmethod

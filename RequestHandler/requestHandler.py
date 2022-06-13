@@ -209,7 +209,7 @@ class RequestHandler():
             flag['annotation_event_id'] = annotation_id
             flag['_token'] = self.login_data['_token']
             r = s.post(url,data=flag)
-            print(r.content)
+            print(f"Flag sent, server answered with following data: \n{r.content}")
             return json.loads(r.content)
         except Exception as ex:
             print(ex)
@@ -312,6 +312,21 @@ class RequestHandler():
             for flag_data in json_:
                 self.add_flag_to_canvas(s,recording_id,canvas_name,flag_data["flag"],flag_data["annotation_name"])
             f.close()
+
+    def set_flag_for_frames(self,s,frames,record_id,canvas_name,cam,annotation_name="goals"):
+        flag = {
+            'id':'',
+            'channel_name':f'ch{cam}',
+            'comment': '',
+            'offset_before': 10000,
+            'offset_after': 5000,
+            'hasValidationErrors': False,
+            'getValidationErrorsList':'', 
+        }
+        for frame in frames:
+            flag['time'] = UtilityHandler.convert_frame_to_time(frame)
+            self.add_flag_to_canvas(s,record_id,canvas_name,flag,annotation_name)
+            
 
     @staticmethod
     def request_session():
