@@ -211,10 +211,9 @@ class Main(Frame):
         self.cam_6_label.configure(image=image)
 
     def save_crop_vector(self,vector):
-        with open(f"DataHandler/data/crop.json.json","w") as f:
+        with open(f"DataHandler/data/crop.json","w") as f:
             json.dump(vector,f)
             f.close()
-
 
 if __name__ == '__main__':
     requestHandler = RequestHandler()

@@ -99,10 +99,7 @@ def get_all_cropped_images(clip,cam,start_video=90,cropped_under_line=True,clear
 def crop_video(clip,vector,src_path="DataHandler/SourceFiles/Videos",dest_path="DataHandler/SourceFiles/CroppedVideos",max_frame=-1):
   cap = cv2.VideoCapture(f"{src_path}/{clip}.mp4")
   fps= cap.get(cv2.CAP_PROP_FPS)
-  #vector = {4:{"x":460,"y":910,"w":1010,"h":1080-910},6:{"x":530,"y":900,"w":930,"h":1080-900}}[cam]
-
-  # vector = {"x":420,"y":900,"w":1100,"h":1080-900}
-  # vector["h"] = 1080 - vector["y"]
+  #vector = {"4":{"x":460,"y":910,"w":1010,"h":170},"6":{"x":530,"y":900,"w":930,"h":180}}[cam]
 
   fourcc = cv2.VideoWriter_fourcc(*'mp4v')
   out = cv2.VideoWriter(f"{dest_path}/{clip}.mp4", fourcc, fps, (vector["w"], vector["h"]))

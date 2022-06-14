@@ -15,7 +15,7 @@ class Cam6(Frame):
         data_path = str(Path(sys.path[0])) + "/DataHandler"
 
         with open(f"{data_path}/data/crop.json", "r",encoding="utf8") as f:
-            vector = json.load(f)["4"]
+            vector = json.load(f)["6"]
             f.close()
         
         resize_x = 1920
