@@ -7,7 +7,7 @@ import requests
 
 import logging
 from tkinter import *
-from tkinter.ttk import Notebook
+from tkinter.ttk import Notebook, Progressbar
 from queue import Queue
 from tkinter import filedialog
 from tracemalloc import start
@@ -22,6 +22,8 @@ from GUI.Frames.Cam6 import Cam6
 from GUI.Frames.CanvasFrame import CanvasFrame
 
 import yolov5_custom.detect as detect
+
+from tkinter.messagebox import showinfo
 
 class Main(Frame):
     def __init__(self, master=None):
@@ -59,8 +61,24 @@ class Main(Frame):
         self.submit_form = Button(self, text = "Detect goals", command=self.submit_form)
         self.submit_form.grid(row=4, column=0, columnspan=2, sticky=S+E+W)
 
+        self.progressbar = Progressbar(self, orient='horizontal', mode='determinate', length=400)
+        self.progressbar.grid(row=5, column=0, columnspan=2, sticky=N, pady=10)
+
+        self.progressbar_label = Label(self, text="Current Progress: ")
+        self.progressbar_label.grid(row=6, column=0, columnspan=2, sticky=N)
+
         Grid.columnconfigure(self, 6, weight=1)
-        Grid.rowconfigure(self, 5, weight=1)
+        Grid.rowconfigure(self, 6, weight=1)
+    
+    def update_progress_label(self):
+        return f"Current Progress: {self.progressbar['value']}%"
+    
+    def progress(self):
+        if self.progressbar['value'] != 100:
+            self.progressbar['value'] += 100/3
+            self.progressbar_label['text'] = self.update_progress_label()
+        else:
+            showinfo(message='The progress completed!')
 
     def submit_form(self):
         cams = [4,6]
@@ -105,6 +123,7 @@ class Main(Frame):
                 record_id = requestHandler.get_recording_by_name(s,"A-Team - Diest")["id"]
                 requestHandler.download_recordings_by_cam(s,record_id,cams)
             print("downloaded videos")
+            self.progress()
 
         for cam in cams:
             print(f"cropping video {cam}")
@@ -126,12 +145,14 @@ class Main(Frame):
             with open(f"ball_output/filtered_for_goals_{cam}.json","w") as f:
                 json.dump(detected_goals,f)
                 f.close()
+            self.progress()
 
             print("Sending flags")
             with requests.Session() as s:
                 requestHandler.login(s)
                 record_id = requestHandler.get_recording_by_name(s,recording_name)["id"]
                 requestHandler.set_flag_for_frames(s,detected_goals,record_id,canvas_name,cam=cam)
+            self.progress()
             break
 
     def submit_name(self, url):
