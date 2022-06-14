@@ -150,7 +150,7 @@ class Main(Frame):
             self.load_image_c6("DataHandler/SourceFiles/Images/ch6.jpg")
             print("C6 Done")  
 
-    def show_image_preview_cam_4(self, previous_state):
+    def show_image_preview_cam_4(self, previous_state=""):
         resize_x = 480
         resize_y = 270
 
@@ -163,7 +163,7 @@ class Main(Frame):
 
         self.update_cam_4(image)
 
-    def show_image_preview_cam_6(self, previous_state):
+    def show_image_preview_cam_6(self, previous_state=""):
         resize_x = 480
         resize_y = 270
 
@@ -184,6 +184,7 @@ class Main(Frame):
         image = cv2.imread(self.cam_4_image.get())
         half = cv2.resize(image, (480,270))
         self.update_cam_4(half)
+        self.show_image_preview_cam_4()
 
     def load_image_c6(self, filename):
         self.cam_6_image.set(filename)
@@ -193,6 +194,7 @@ class Main(Frame):
         image = cv2.imread(self.cam_6_image.get())
         half = cv2.resize(image, (480,270))
         self.update_cam_6(half)
+        self.show_image_preview_cam_6()
 
     def update_cam_4(self, image):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
