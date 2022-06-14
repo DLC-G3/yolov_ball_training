@@ -11,6 +11,8 @@ import json
 import sys
 from pathlib import Path
 
+import validators
+
 path = str(Path(sys.path[0])) + "/RequestHandler"
 data_path = str(Path(sys.path[0])) + "/DataHandler"
 
@@ -320,6 +322,12 @@ class RequestHandler():
             if recording_id not in self.get_all_clipped_recording_ids():
                 temp_recording_ids.append(recording_id)
         return temp_recording_ids
+
+    def get_recording_id(self,s,string):
+        if validators.url(string):
+            return string.split('/')[-1]
+        else:
+            return self.get_recording_by_name(self,s,string)["id"]
 
     def get_recording_by_name(self,s,title):
         recordings = self.get_all_recordings(s)
