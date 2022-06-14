@@ -242,7 +242,7 @@ class RequestHandler():
         except Exception as ex:
             print(ex)
 
-    def request_clip_creation(self,s,recording_id,canvas_id,annotation_names=["-"]):
+    def request_clip_creation(self,s,recording_id,canvas_id,annotation_names=["goal cam1","goal cam4","goal cam6"]):
         url = self.url + f'/annotation-area/canvases/{canvas_id}/export'
 
         clip_data = {

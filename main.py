@@ -141,6 +141,12 @@ class Main(Frame):
                 requestHandler.login(s)
                 record_id = requestHandler.get_recording_id(s,self.input_recording)
                 requestHandler.set_flag_for_frames(s,detected_goals,record_id,canvas_name,cam=cam)
+                
+        with requests.Session() as s:
+            requestHandler.login(s)
+            record_id = requestHandler.get_recording_id(s,self.input_recording)
+            canvas_id = requestHandler.get_canvas_by_name(s,record_id,canvas_name)
+            requestHandler.request_clip_creation(s,record_id,canvas_id)
 
     def submit_name(self, input_recording):
         self.input_recording = input_recording
