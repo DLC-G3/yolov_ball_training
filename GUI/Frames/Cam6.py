@@ -10,10 +10,6 @@ class Cam6(Frame):
     def init_window(self):
         Label(self, text="Cam 6: ").grid(row=0, sticky=W, padx=10, pady=4)
 
-        self.cam_4_preview = Button(self, text = "Browse images", command=self.master.browse_files_cam_6)
-        self.cam_4_preview.grid(row=1, column=0, sticky=N+W, padx=10)
-        self.label_cam_4 = Label(self, textvariable=self.master.cam_6_image_short).grid(row=1, column=1, sticky=N+W)
-
         Label(self, text="Top left: ").grid(row=2, sticky=W, padx=10, pady=4)
         Label(self, text="x: ").grid(row=3, sticky=W, padx=10)
         self.sli_1_x = Scale(self, from_=0, to=100, resolution=0.01, orient=HORIZONTAL, sliderlength=10, length=400, command=self.master.show_image_preview_cam_6)
