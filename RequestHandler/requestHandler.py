@@ -324,7 +324,7 @@ class RequestHandler():
         return temp_recording_ids
 
     def get_recording_id(self,s,string):
-        return get_recording(s,string)["id"]
+        return self.get_recording(s,string)["id"]
 
     def get_recording(self,s,string):
         if validators.url(string):

@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     with requests.Session() as s:
         requestHandler.login(s)
-        record_id =  RequestHandler.get_recording_id(s,recording_name) #requestHandler.get_recording_by_name(s,"A-Team - Diest")["id"]
+        record_id =  requestHandler.get_recording_id(s,recording_name) #requestHandler.get_recording_by_name(s,"A-Team - Diest")["id"]
         requestHandler.download_thumbnail_by_cam(s,record_id,cams)
 
     if read_from_json:
