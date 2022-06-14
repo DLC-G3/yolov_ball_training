@@ -86,6 +86,26 @@ class Main(Frame):
 
         crop_vector = {4:{"x":x_4,"y":y_4,"w":w_4,"h":h_4},6:{"x":x_6,"y":y_6,"w":w_6,"h":h_6}}
 
+        cams = [4,6]
+        recording_name = "A-Team - Diest"
+        canvas_name = self.canvas_frame.entry_canvas_name.get()
+
+        th = 0.72 # threshhold ball accuracy
+        read_from_json = False
+
+        if read_from_json:
+            for cam in cams:
+                with open(f"ball_output/labels_detected_obj_{cam}.json","r",encoding="utf8") as f:
+                    json_ = json.load(f)
+                    print(json_)
+                break
+        else:
+            with requests.Session() as s:
+                requestHandler.login(s)
+                record_id = requestHandler.get_recording_by_name(s,"A-Team - Diest")["id"]
+                requestHandler.download_recordings_by_cam(s,record_id,cams)
+            print("downloaded videos")
+
         for cam in cams:
             print(f"cropping video {cam}")
             VideoHandler.crop_video(f"ch{cam}", crop_vector, cam=cam,max_frame=124650) # max_frame=162000
@@ -124,7 +144,7 @@ class Main(Frame):
         self.load_image_c6("DataHandler/SourceFiles/Images/ch6.jpg")
         print("C6 Done")  
 
-    def show_image_preview_cam_4(self):
+    def show_image_preview_cam_4(self, previous_state):
         resize_x = 480
         resize_y = 270
 
@@ -137,7 +157,7 @@ class Main(Frame):
 
         self.update_cam_4(image)
 
-    def show_image_preview_cam_6(self):
+    def show_image_preview_cam_6(self, previous_state):
         resize_x = 480
         resize_y = 270
 
@@ -195,22 +215,3 @@ if __name__ == '__main__':
         root.mainloop()
     except KeyboardInterrupt:
         app.on_closing()
-
-    cams = [4,6]
-    recording_name = "A-Team - Diest"
-    canvas_name = "Auto test 10/06 JTJ"
-    th = 0.72 # threshhold ball accuracy
-    read_from_json = False
-
-    if read_from_json:
-        for cam in cams:
-            with open(f"ball_output/labels_detected_obj_{cam}.json","r",encoding="utf8") as f:
-                json_ = json.load(f)
-                print(json_)
-            break
-    else:
-        with requests.Session() as s:
-            requestHandler.login(s)
-            record_id = requestHandler.get_recording_by_name(s,"A-Team - Diest")["id"]
-            requestHandler.download_recordings_by_cam(s,record_id,cams)
-        print("downloaded videos")
