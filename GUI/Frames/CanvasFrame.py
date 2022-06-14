@@ -12,6 +12,7 @@ class CanvasFrame(Frame):
 
         self.entry_canvas_name = Entry(self)
         self.entry_canvas_name.grid(row=1, column=0, columnspan=4, sticky=N+S+E+W)
+        self.entry_canvas_name.insert(0, "Goals: Automated (JTJ)")
 
         Grid.rowconfigure(self, 0, weight=1)
         Grid.columnconfigure(self, 3, weight=1)

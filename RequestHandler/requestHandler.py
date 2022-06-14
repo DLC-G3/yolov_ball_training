@@ -63,11 +63,14 @@ class RequestHandler():
         #     # self.request_clip_creation(s,self.recording_ids[0],'Doelpunten G3',["1 - 0 cam4","2 - 0 cam4","3 - 0 cam4"])
 
     def authenticate_session(self,s,url):
-        r = s.get(url,headers=self.headers)
-        soup = BeautifulSoup(r.text, 'lxml')
+        try:
+            r = s.get(url,headers=self.headers)
+            soup = BeautifulSoup(r.text, 'lxml')
 
-        csrf_token = soup.find('input',attrs = {'name':'_token'})['value']
-        self.login_data['_token'] = csrf_token
+            csrf_token = soup.find('input',attrs = {'name':'_token'})['value']
+            self.login_data['_token'] = csrf_token
+        except Exception:
+            return
         
     def login(self,s):
         url = self.url + '/login'
@@ -324,10 +327,20 @@ class RequestHandler():
         return temp_recording_ids
 
     def get_recording_id(self,s,string):
+        return self.get_recording(s,string)["id"]
+
+    def get_recording(self,s,string):
         if validators.url(string):
-            return string.split('/')[-1]
+            return self.get_recording_by_id(s,int(string.split('/')[-1]))
         else:
-            return self.get_recording_by_name(self,s,string)["id"]
+            return self.get_recording_by_name(s,string)
+
+    def get_recording_by_id(self,s,recording_id):
+        recordings = self.get_all_recordings(s)
+        for recording in recordings:
+            if recording['id'] == recording_id:
+                return recording
+        return None
 
     def get_recording_by_name(self,s,title):
         recordings = self.get_all_recordings(s)

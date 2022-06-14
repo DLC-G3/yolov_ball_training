@@ -31,6 +31,7 @@ class Main(Frame):
         self.init_window()
 
     def init_window(self):
+        self.input_recording = ""
         self.cam_4_image = StringVar()
         self.cam_4_image_short = StringVar()
         self.cam_6_image = StringVar()
@@ -64,10 +65,9 @@ class Main(Frame):
 
     def submit_form(self):
         cams = [4,6]
-
-        resize_x = 480
-        resize_y = 270
-        
+        resize_x = 1920
+        resize_y = 1080
+    
         starting_point_4 = (round(self.cam_4_frame.sli_1_x.get() / 100 * resize_x), round(self.cam_4_frame.sli_1_y.get() / 100 * resize_y))
         ending_point_4 = (round(self.cam_4_frame.sli_2_x.get() / 100 * resize_x), round(self.cam_4_frame.sli_2_y.get() / 100 * resize_y))
 
@@ -79,41 +79,45 @@ class Main(Frame):
         w_4 = ending_point_4[0] - x_4 + 1
         h_4 = ending_point_4[1] - y_4 + 1
 
+        if x_4 + w_4 > resize_x:
+            w_4 = resize_x - x_4
+
+        if y_4 + h_4 > resize_y:
+            h_4 = resize_y - y_4
+
         x_6 = starting_point_6[0]
         y_6 = starting_point_6[1]
-        w_6 = ending_point_6[0] - x_6 + 1
-        h_6 = ending_point_6[1] - y_6 + 1
+        w_6 = ending_point_6[0] - x_6
+        h_6 = ending_point_6[1] - y_6
+
+        if x_6 + w_6 > resize_x:
+            w_6 = resize_x - x_6
+
+        if y_6 + h_6 > resize_y:
+            h_6 = resize_y - y_6
 
         crop_vector = {4:{"x":x_4,"y":y_4,"w":w_4,"h":h_4},6:{"x":x_6,"y":y_6,"w":w_6,"h":h_6}}
+        self.save_crop_vector(crop_vector)
 
         cams = [4,6]
-        recording_name = "A-Team - Diest"
+        self.input_recording = self.recording_frame.entry_recording_name.get()
         canvas_name = self.canvas_frame.entry_canvas_name.get()
+        th = 0.72
 
-        th = 0.72 # threshhold ball accuracy
-        read_from_json = False
-
-        if read_from_json:
-            for cam in cams:
-                with open(f"ball_output/labels_detected_obj_{cam}.json","r",encoding="utf8") as f:
-                    json_ = json.load(f)
-                    print(json_)
-                break
-        else:
-            with requests.Session() as s:
-                requestHandler.login(s)
-                record_id = requestHandler.get_recording_by_name(s,"A-Team - Diest")["id"]
-                requestHandler.download_recordings_by_cam(s,record_id,cams)
-            print("downloaded videos")
+        with requests.Session() as s:
+            requestHandler.login(s)
+            record_id = requestHandler.get_recording_id(s,self.input_recording)
+            requestHandler.download_recordings_by_cam(s,record_id,cams)
+        print("downloaded videos")
 
         for cam in cams:
             print(f"cropping video {cam}")
-            VideoHandler.crop_video(f"ch{cam}", crop_vector, cam=cam,max_frame=124650) # max_frame=162000
+            VideoHandler.crop_video(f"ch{cam}",crop_vector[cam], cam=cam,max_frame=124650) # max_frame=162000
             print("starting detection:")
 
             # for video testing:
-            detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2) 
-            detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}_cropped_full.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2)
+            # detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2) 
+            # detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}_cropped_full.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2)
             
             detected_objects = detect.run_optimised_for_ball(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),project="./ball_output") 
             print(detected_objects)
@@ -130,19 +134,21 @@ class Main(Frame):
             print("Sending flags")
             with requests.Session() as s:
                 requestHandler.login(s)
-                record_id = requestHandler.get_recording_by_name(s,recording_name)["id"]
+                record_id = requestHandler.get_recording_id(s,self.input_recording)
                 requestHandler.set_flag_for_frames(s,detected_goals,record_id,canvas_name,cam=cam)
             break
 
-    def submit_name(self, url):
-        record_id = url.split('/')[-1]
-        with requests.Session() as s:
-            requestHandler.login(s)
-            requestHandler.download_thumbnail_by_cam(s, record_id)
-        self.load_image_c4("DataHandler/SourceFiles/Images/ch4.jpg")
-        print("C4 Done")
-        self.load_image_c6("DataHandler/SourceFiles/Images/ch6.jpg")
-        print("C6 Done")  
+    def submit_name(self, input_recording):
+        self.input_recording = input_recording
+        if self.input_recording != "":
+            with requests.Session() as s:
+                requestHandler.login(s)
+                record_id = requestHandler.get_recording_id(s,input_recording)
+                requestHandler.download_thumbnail_by_cam(s, record_id)
+            self.load_image_c4("DataHandler/SourceFiles/Images/ch4.jpg")
+            print("C4 Done")
+            self.load_image_c6("DataHandler/SourceFiles/Images/ch6.jpg")
+            print("C6 Done")  
 
     def show_image_preview_cam_4(self, previous_state):
         resize_x = 480
@@ -203,6 +209,12 @@ class Main(Frame):
 
         self.cam_6_label.image = image  # <== this is were we anchor the img object
         self.cam_6_label.configure(image=image)
+
+    def save_crop_vector(self,vector):
+        with open(f"DataHandler/data/crop.json.json","w") as f:
+            json.dump(vector,f)
+            f.close()
+
 
 if __name__ == '__main__':
     requestHandler = RequestHandler()
