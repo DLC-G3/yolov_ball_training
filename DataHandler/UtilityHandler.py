@@ -11,7 +11,8 @@ class UtilityHandler():
         return ms
 
     @staticmethod
-    def convert_frame_to_time(frame,fps=25.033316316784834):
+    def convert_frame_to_time(frame,fps=24):
+        # 25.033316316784834
         ms = 1000/fps*frame
         return ms
 

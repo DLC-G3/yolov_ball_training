@@ -203,7 +203,8 @@ class RequestHandler():
 
     def get_annotation_event_by_names(self,s,recording_id,annotation_names,canvas_id=None):
         for annotation in self.get_annotation_events_by_recording(s,recording_id):
-            if UtilityHandler.is_similar_to_item_in_list(annotation['name'],annotation_names):
+            if annotation["name"] in annotation_names:
+            #if UtilityHandler.is_similar_to_item_in_list(annotation['name'],annotation_names):
                 if canvas_id == None or annotation["canvas_id"] == canvas_id: 
                     return annotation  
         return None
@@ -356,19 +357,22 @@ class RequestHandler():
                 self.add_flag_to_canvas(s,recording_id,canvas_name,flag_data["flag"],flag_data["annotation_name"])
             f.close()
 
-    def set_flag_for_frames(self,s,frames,record_id,canvas_name,cam,annotation_name="goals"):
+    def set_flag_for_frames(self,s,frames,record_id,canvas_name,cam,annotation_name="goal"):
         flag = {
             'id':'',
-            'channel_name':f'ch{cam}',
             'comment': '',
-            'offset_before': 10000,
-            'offset_after': 5000,
+            'offset_before': 15000,
+            'offset_after': 10000,
             'hasValidationErrors': False,
             'getValidationErrorsList':'', 
         }
         for frame in frames:
+            flag['channel_name'] = f'ch{cam}'
             flag['time'] = UtilityHandler.convert_frame_to_time(frame)
-            self.add_flag_to_canvas(s,record_id,canvas_name,flag,annotation_name)
+            self.add_flag_to_canvas(s,record_id,canvas_name,flag,f"{annotation_name} cam{cam}")
+            flag["channel_name"] = "ch1"
+            flag['time'] = UtilityHandler.convert_frame_to_time(frame-24*5)
+            self.add_flag_to_canvas(s,record_id,canvas_name,flag,f"{annotation_name} cam1")
             
 
     @staticmethod
