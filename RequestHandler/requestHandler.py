@@ -63,11 +63,14 @@ class RequestHandler():
         #     # self.request_clip_creation(s,self.recording_ids[0],'Doelpunten G3',["1 - 0 cam4","2 - 0 cam4","3 - 0 cam4"])
 
     def authenticate_session(self,s,url):
-        r = s.get(url,headers=self.headers)
-        soup = BeautifulSoup(r.text, 'lxml')
+        try:
+            r = s.get(url,headers=self.headers)
+            soup = BeautifulSoup(r.text, 'lxml')
 
-        csrf_token = soup.find('input',attrs = {'name':'_token'})['value']
-        self.login_data['_token'] = csrf_token
+            csrf_token = soup.find('input',attrs = {'name':'_token'})['value']
+            self.login_data['_token'] = csrf_token
+        except Exception:
+            return
         
     def login(self,s):
         url = self.url + '/login'
