@@ -40,3 +40,6 @@ thop  # FLOPs computation
 # roboflow
 
 validators
+
+bs4
+tk
