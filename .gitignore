@@ -9,3 +9,4 @@ training_data
 /.vs
 /.vscode
 venv
+*environment_data.json
