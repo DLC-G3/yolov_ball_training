@@ -99,20 +99,21 @@ class Main(Frame):
         crop_vector = {4:{"x":x_4,"y":y_4,"w":w_4,"h":h_4},6:{"x":x_6,"y":y_6,"w":w_6,"h":h_6}}
         self.save_crop_vector(crop_vector)
 
-        cams = [4,6]
+        cams = [6]
         self.input_recording = self.recording_frame.entry_recording_name.get()
         canvas_name = self.canvas_frame.entry_canvas_name.get()
         th = 0.72
+        record_id = 3
 
-        with requests.Session() as s:
-            requestHandler.login(s)
-            record_id = requestHandler.get_recording_id(s,self.input_recording)
-            requestHandler.download_recordings_by_cam(s,record_id,cams)
+        # with requests.Session() as s:
+        #     requestHandler.login(s)
+        #     record_id = requestHandler.get_recording_id(s,self.input_recording)
+        #     requestHandler.download_recordings_by_cam(s,record_id,cams)
         print("downloaded videos")
 
         for cam in cams:
             print(f"cropping video {cam}")
-            VideoHandler.crop_video(f"ch{cam}",crop_vector[cam], cam=cam,max_frame=124650) # max_frame=162000
+            # VideoHandler.crop_video(f"ch{cam}",crop_vector[cam],max_frame=200000) # max_frame=162000
             print("starting detection:")
 
             # for video testing:
@@ -141,7 +142,7 @@ class Main(Frame):
                 requestHandler.login(s)
                 record_id = requestHandler.get_recording_id(s,self.input_recording)
                 requestHandler.set_flag_for_frames(s,detected_goals,record_id,canvas_name,cam=cam)
-                
+
         with requests.Session() as s:
             requestHandler.login(s)
             record_id = requestHandler.get_recording_id(s,self.input_recording)
