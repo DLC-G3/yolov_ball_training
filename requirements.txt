@@ -41,5 +41,6 @@ thop  # FLOPs computation
 
 validators
 
-bs4
+beautifulsoup4
+lxml
 tk
