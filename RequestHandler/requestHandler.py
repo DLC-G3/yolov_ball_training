@@ -213,10 +213,9 @@ class RequestHandler():
         annotations = []
         for annotation in self.get_annotation_events_by_recording(s,recording_id):
             if UtilityHandler.is_similar_to_item_in_list(annotation['name'],annotation_names):
-                if canvas_id == None or annotation["canvas_id"] == canvas_id: 
+                if (canvas_id == None) or (annotation["canvas_id"] == canvas_id): 
                     print(annotation["name"])
                     annotations.append(annotation)
-                    continue
         
         return annotations
 
@@ -253,7 +252,6 @@ class RequestHandler():
         }
 
         if len(clip_data['annotation_events[]']) != 0:
-            print(clip_data)
             r = s.post(url,data=clip_data)
             print(f'Request for clip creation: {status_codes[r.status_code]}')
         

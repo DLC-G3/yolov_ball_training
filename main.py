@@ -99,15 +99,15 @@ class Main(Frame):
         crop_vector = {4:{"x":x_4,"y":y_4,"w":w_4,"h":h_4},6:{"x":x_6,"y":y_6,"w":w_6,"h":h_6}}
         self.save_crop_vector(crop_vector)
 
-        cams = [6]
+        cams = [4]
         self.input_recording = self.recording_frame.entry_recording_name.get()
         canvas_name = self.canvas_frame.entry_canvas_name.get()
         th = 0.72
-        record_id = 3
+        record_id = 0
 
-        # with requests.Session() as s:
-        #     requestHandler.login(s)
-        #     record_id = requestHandler.get_recording_id(s,self.input_recording)
+        with requests.Session() as s:
+            requestHandler.login(s)
+            record_id = requestHandler.get_recording_id(s,self.input_recording)
         #     requestHandler.download_recordings_by_cam(s,record_id,cams)
         print("downloaded videos")
 
@@ -120,11 +120,11 @@ class Main(Frame):
             # detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2) 
             # detect.run(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}_cropped_full.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),save_txt=True,project="./ball_output",line_thickness=2)
             
-            # with open(f"ball_output/labels_detected_obj_4.json", "r",encoding="utf8") as f:
-            #     detected_objects = json.load(f)
-            #     f.close()                
+            with open(f"ball_output/labels_detected_obj_{cam}.json", "r",encoding="utf8") as f:
+                detected_objects = json.load(f)
+                f.close()                
 
-            detected_objects = detect.run_optimised_for_ball(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),project="./ball_output") 
+            # detected_objects = detect.run_optimised_for_ball(source=f"DataHandler/SourceFiles/CroppedVideos/ch{cam}.mp4",weights="trained_data/latest_3/weights/last.pt",conf_thres=(th),project="./ball_output") 
             #print(detected_objects)
 
             with open(f"ball_output/labels_detected_obj_{cam}_{record_id}.json","w") as f:
@@ -143,10 +143,11 @@ class Main(Frame):
                 record_id = requestHandler.get_recording_id(s,self.input_recording)
                 requestHandler.set_flag_for_frames(s,detected_goals,record_id,canvas_name,cam=cam)
 
+        print("requesting clip creation")
         with requests.Session() as s:
             requestHandler.login(s)
             record_id = requestHandler.get_recording_id(s,self.input_recording)
-            canvas_id = requestHandler.get_canvas_by_name(s,record_id,canvas_name)
+            canvas_id = requestHandler.get_canvas_by_name(s,record_id,canvas_name)["id"]
             requestHandler.request_clip_creation(s,record_id,canvas_id)
 
     def submit_name(self, input_recording):
