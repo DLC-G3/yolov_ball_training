@@ -4,7 +4,7 @@ trained_data
 training_data
 
 *__pycache__
-
+*environment_data.json
 *cache
 **.mp4
 **.jpg
